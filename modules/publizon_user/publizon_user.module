@@ -212,23 +212,14 @@ function publizon_user_block($op = 'list', $delta = 0) {
                 '@amount' => format_plural($library_profile->getMaxLoans(), 'one product', '@count products'),
               )) . '</p>';
 
-            // If max loans have been reached. Run over the loans an find the
-            // loan that exipres first and display the time until the user can
-            // make a new loan.
-            $var = 'usere_book_loans_remain';
-            $type = variable_get('publizon_site_type', PUBLIZON_EBOOK);
-            if ($type == PUBLIZON_NETSOUND) {
-              $var = 'usere_sound_loans_remain';
-            }
-
-            // If the current type and user have 0 loans left.
+            // If the current user and type have 0 loans left.
             $user_loans = new PublizonUserLoans($user->uid);
-            if (isset($user_loans->$var) && $user_loans->$var == 0) {
+            if (isset($user_loans->usere_book_loans_remain) && $user_loans->usere_book_loans_remain == 0) {
               $content .= '<p class="next-loan-periode">' . $user_loans->nextLoanPeriode() . '</p>';
             }
           }
           catch (Exception $e) {
-            // The message shoudl already be translated in the custom exception.
+            // The message is translated in the custom exception.
             drupal_set_message($e->getMessage(), 'error', FALSE);
           }
           // Add content to output.

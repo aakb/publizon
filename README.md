@@ -151,3 +151,10 @@ The object as one function to extract max loans per borrower and it properties.
   $library_profile = new PublizonLibrary();
   $library_profile->getMaxLoans();
 ```
+
+# TODO
+Things that should be changed or is missing.
+
+  * Enable administrator to set the different cache timeouts in the UI.
+  * Drush support for cache clearing each user.
+  * Implement the last API functions to publizon.

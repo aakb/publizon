@@ -49,7 +49,7 @@ function publizon_user_install() {
   // Install database schema.
   drupal_install_schema('publizon_user');
 
-    // Check if old table exits (upgrade path from elib).
+  // Check if old table exits (upgrade path from elib).
   if (db_table_exists('elib_user')) {
     $query = "INSERT INTO {publizon_user} (uid, pid, retailer_id)
               SELECT uid, elib_id, elib_library

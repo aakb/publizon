@@ -15,6 +15,12 @@ define('PUBLIZON_EBOOK', 1);
 define('PUBLIZON_NETSOUND', 2);
 
 /**
+ * Define constances used to detect the users current device platform.
+ */
+define('PUBLIZON_PLATFORM_GENERIC', 1);
+define('PUBLIZON_PLATFORM_IOS', 2);
+
+/**
  * Implements hook_perm().
  */
 function publizon_perm() {
@@ -135,18 +141,6 @@ function publizon_library_field_validate($element, &$form_state) {
 }
 
 /**
- * Implements hook_flush_caches().
- *
- * Ensures that all caches used by the module is flush on cache clear. The
- * module also comes with drush support for clearing these caches.
- *
- * @see publizon.drush.inc
- */
-function publizon_flush_caches() {
-  return array('cache_publizon_product');
-}
-
-/**
  * Implements hook_block().
  *
  * Creates a block with an list over the x last loans from the site.
@@ -162,20 +156,32 @@ function publizon_block($op = 'list', $delta = 0) {
       break;
 
     case 'view':
+      $content = '';
+
       // Get site type
       $type = variable_get('publizon_site_type', PUBLIZON_EBOOK);
 
-      try {
-        // Try to get connection with publizon and fetch list of last loans
-        $client = PublizonClient::getClient();
-        $products = $client->getLastLoansForAll($type);
-
-        // Theme the last loans as a product list.
-        $content = theme('publizon_products_list', $products);
+      // Check for cached version of last loans.
+      $cid = 'publizon_last_loan_' . $type;
+      if ($cache = cache_get($cid)) {
+        $content = $cache->data;
       }
-      catch (Exception $e) {
-        // Something was not right, so display the error in the block.
-        $content = $e->getMessage();
+      else {
+        try {
+          // Try to get connection with publizon and fetch list of last loans
+          $client = PublizonClient::getClient();
+          $products = $client->getLastLoansForAll($type);
+
+          // Theme the last loans as a product list.
+          $content = theme('publizon_products_list', $products);
+
+          // Store the content in cache (10 min).
+          cache_set($cid, $content, 'cache', time() + 600);
+        }
+        catch (Exception $e) {
+          // Something was not right, so display the error in the block.
+          $content = $e->getMessage();
+        }
       }
 
       // Add content to the block.
@@ -326,4 +332,21 @@ function publizon_ting_find_object($isbn) {
   }
 
   return $object;
+}
+
+/**
+ * Detect the current users platform and return a constances for that platform.
+ *
+ * @return int
+ *  Returns the constances PUBLIZON_PLATFORM_IOS or PUBLIZON_PLATFORM_GENERIC.
+ */
+function publizon_get_client_platform() {
+  $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+  if (preg_match('/(iPod)|(iPad)|(iPhone)/i', $user_agent)) {
+    return PUBLIZON_PLATFORM_IOS;
+  }
+  else {
+    return PUBLIZON_PLATFORM_GENERIC;
+  }
 }

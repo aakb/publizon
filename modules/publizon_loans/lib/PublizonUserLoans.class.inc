@@ -234,6 +234,9 @@ class PublizonUserLoans extends Publizon {
     // We cache the result until the user makes changes to the loans or loan
     // expires.
     cache_set($user->uid, $this->properties, 'cache_publizon_loans');
+
+    // Loans have been refreshed, so the loan block cache needs to be updated.
+    cache_clear_all('publizon_loan_block_' . $user->uid, 'cache_publizon_loans');
   }
 
   /**
