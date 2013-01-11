@@ -63,20 +63,16 @@ class PublizonUserLoans extends Publizon {
    */
   public function __construct($uid, $fetch_ting_object = FALSE, $card_number = NULL, $reset = FALSE) {
     // Check cache for the properties values.
-    if (!$reset && ($cache = cache_get($uid, 'cache_publizon_loans'))) {
+    if (!$reset && ($cache = cache_get($uid, 'cache_publizon_loans')) && $cache->expire > time()) {
       $this->properties = $cache->data;
     }
     else {
-      // Get the users loans.
-      $this->fetchLoans();
-
-      // We cache the result until the user makes changes to the loans or loan
-      // expires.
-      cache_set($uid, $this->properties, 'cache_publizon_loans');
+      // Get the users loans by building local cache.
+      $this->refreshCache();
     }
 
     // This can not be done when parsing the loans, as this has to be outside
-    // cache and freash data always.
+    // cache and fresh data always.
     if ($fetch_ting_object) {
       foreach ($this->loans as $loan) {
         $loan->product->getTingObject();
@@ -150,16 +146,30 @@ class PublizonUserLoans extends Publizon {
     }
     $hours = (date_difference(time(), $expire, 'hours', DATE_UNIX));
     if ($hours <= 24) {
-      $str = t('You can loan a new product in %hours.', array('%hours' => format_plural($hours, 'one hour', '@count hours')));
+      $str = t('You can loan a new product in %hours.', array('%hours' => format_plural(ceil($hours), 'one hour', '@count hours')));
     }
     else {
       $days = date_difference(time(), $expire, 'days', DATE_UNIX);
-      $str = t('You can loan a new product in %days.', array('%days' => format_plural($days, 'one day', '@count days')));
+      $str = t('You can loan a new product in %days.', array('%days' => format_plural(ceil($days), 'one day', '@count days')));
     }
 
     return $str;
   }
 
+  /**
+   * Find the first loand to expire.
+   *
+   * @return int
+   *  The expire date of the first loan to expire in seconds.
+   */
+  public function firstExpireTime() {
+    $expire = 9999999999999;
+    foreach ($this->loans as $loan) {
+      $expire = ($loan->expire_date > $expire) ? $expire : $loan->expire_date;
+    }
+
+    return $expire;
+  }
 
   /**
    * Fetch all loans for the current user.
@@ -233,7 +243,7 @@ class PublizonUserLoans extends Publizon {
 
     // We cache the result until the user makes changes to the loans or loan
     // expires.
-    cache_set($user->uid, $this->properties, 'cache_publizon_loans');
+    cache_set($user->uid, $this->properties, 'cache_publizon_loans', $this->firstExpireTime());
 
     // Loans have been refreshed, so the loan block cache needs to be updated.
     cache_clear_all('publizon_loan_block_' . $user->uid, 'cache_publizon_loans');
@@ -266,7 +276,12 @@ class PublizonUserLoans extends Publizon {
 
     $loans = array();
     foreach ($data[0]->orderitem as $item) {
-      $loans[(string)$item->book->attributes()->id] = new PublizonLoan($item);
+      // Load loans and check if the loan is expired, only storing no-expired
+      // loans locally.
+      $loan = new PublizonLoan($item);
+      if (!$loan->isExpired()) {
+        $loans[(string)$item->book->attributes()->id] = $loan;
+      }
     }
     $this->loans = $loans;
   }
