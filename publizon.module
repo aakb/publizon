@@ -266,7 +266,7 @@ function publizon_get_authors($ting_object, $link = TRUE) {
   $authors = '';
   if (isset($ting_object->record["dc:creator"]["dkdcplus:aut"][0])) {
     if ($link) {
-      $authors = l($ting_object->record["dc:creator"]["dkdcplus:aut"][0], 'ting/search/' . $ting_object->record["dc:creator"]["dkdcplus:aut"][0]);
+      $authors = l($ting_object->record["dc:creator"]["dkdcplus:aut"][0], 'ting/search/"' . $ting_object->record["dc:creator"]["dkdcplus:aut"][0] . '"');
     }
     else {
       $authors = $ting_object->record["dc:creator"]["dkdcplus:aut"][0];
