@@ -207,9 +207,14 @@ function template_preprocess_publizon_actions(&$vars) {
     // User loan list
     case 'loan':
       $actions[] =  array(
-        '#link' => l(t('Download'), 'publizon/' . $isbn . '/download', array('html' => TRUE, 'attributes' => array('class' => 'loan'))),
+        '#link' => l(t('Stream'), 'publizon/' . $isbn . '/stream', array('html' => TRUE, 'attributes' => array('class' => 'loan ebook-stream', 'target' => '_blank'))),
         '#class' => 'download',
         '#weight' => 1,
+      );
+      $actions[] =  array(
+        '#link' => l(t('Download'), 'publizon/' . $isbn . '/download', array('html' => TRUE, 'attributes' => array('class' => 'loan'))),
+        '#class' => 'download',
+        '#weight' => 2,
       );
       break;
 
