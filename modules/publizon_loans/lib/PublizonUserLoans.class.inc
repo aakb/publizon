@@ -61,7 +61,13 @@ class PublizonUserLoans extends Publizon {
    *  Should the cache be by passed.
    * @throws PublizonProductException
    */
-  public function __construct($uid, $fetch_ting_object = FALSE, $card_number = NULL, $reset = FALSE) {
+  public function __construct($uid = NULL, $fetch_ting_object = FALSE, $card_number = NULL, $reset = FALSE) {
+    // Try to get current users uid.
+    if (is_null($uid)) {
+      global $user;
+      $uid = $user->uid;
+    }
+
     // Check cache for the properties values.
     if (!$reset && ($cache = cache_get($uid, 'cache_publizon_loans')) && $cache->expire > time()) {
       $this->properties = $cache->data;
