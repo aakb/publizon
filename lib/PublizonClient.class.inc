@@ -282,6 +282,15 @@ class PublizonClient {
       $this->logger->log($e->getMessage(), 'ERROR');
       return FALSE;
     }
+
+    // Check if this is a special testcard and set by pass cache session. There
+    // is no problem in using the session here, in relation to revers proxy, as
+    // sessions will be used for logged in user any way.
+    $data = $response->xpath('//data');
+    $_SESSION['by_pass_cache'] = FALSE;
+    if ((string)$data[0]->testcard == 'true') {
+      $_SESSION['by_pass_cache'] = TRUE;
+    }
     return TRUE;
   }
 

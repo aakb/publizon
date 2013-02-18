@@ -62,7 +62,9 @@ function publizon_loans_block($op = 'list', $delta = 0, $edit = array()) {
               // Store the content in cache (30 min). We cache the content as
               // the theme function above needs information from the datawell to
               // ensure that the product is available (the action links).
-              cache_set($cid, $content, 'cache_publizon_loans', time() + 1800);
+              if (!$_SESSION['by_pass_cache']) {
+                cache_set($cid, $content, 'cache_publizon_loans', time() + 1800);
+              }
             }
             catch (Exception $e) {
               drupal_set_message($e->getMessage(), 'error');
