@@ -63,12 +63,13 @@ function publizon_admin_form(&$form_state) {
     '#required' => TRUE,
   );
 
+  $site_type = variable_get('publizon_site_type', PUBLIZON_EBOOK);
   $form['publizon']['settings']['type'] = array(
     '#type' => 'select',
     '#title' => t('Site type'),
     '#description' => t('Which type for information should the Publizon web-service deliver'),
     '#options' => array(PUBLIZON_EBOOK => 'E-book', PUBLIZON_NETSOUND => 'Net sound'),
-    '#default_value' => isset($default['settings']['type']) ? $default['settings']['type'] : PUBLIZON_EBOOK,
+    '#default_value' => $site_type,
   );
 
   $form['publizon']['settings']['logging'] = array(

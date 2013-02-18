@@ -162,7 +162,7 @@ function publizon_user_load_account($login_id, $retailer_id) {
                                FROM {publizon_user}
                               WHERE pid = md5('%s')", $login_id));
   if ($uid) {
-    db_query("UPDATE {publizon_user} SET retailer = %d, pid = '%s'
+    db_query("UPDATE {publizon_user} SET retailer_id = %d, pid = '%s'
                WHERE pid = md5('%s')", $retailer_id, $pid, $login_id);
     return user_load(array('uid' => $uid));
   }
