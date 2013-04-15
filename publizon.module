@@ -207,7 +207,7 @@ function template_preprocess_publizon_actions(&$vars) {
     // User loan list
     case 'loan':
       $actions[] =  array(
-        '#link' => l(t('Download'), 'publizon/' . $isbn . '/download', array('html' => TRUE, 'attributes' => array('class' => 'loan'))),
+        '#link' => l(t('Download'), 'publizon/' . $isbn . '/download', array('html' => TRUE, 'attributes' => array('class' => 'loan', 'action' => 'download'))),
         '#class' => 'download',
         '#weight' => 2,
       );
@@ -230,7 +230,7 @@ function template_preprocess_publizon_actions(&$vars) {
           '#weight' => -10,
         );
         $actions[] = array(
-          '#link' => l(t('Loan'), 'publizon/' . $isbn . '/download', array('html' => TRUE,  'attributes' => array('class' => 'loan'))),
+          '#link' => l(t('Loan'), 'publizon/' . $isbn . '/download', array('html' => TRUE,  'attributes' => array('class' => 'loan', 'action' => 'download'))),
           '#class' => 'loan',
           '#weight' => -5,
         );
