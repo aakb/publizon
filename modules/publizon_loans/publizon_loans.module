@@ -49,26 +49,12 @@ function publizon_loans_block($op = 'list', $delta = 0, $edit = array()) {
 
         // Get information about your loans at Publizon and the datawell.
         if ($uid = publizon_user_is_logged_in()) {
-          // Check for cached version of the block.
-          $cid = 'publizon_loan_block_' . $uid;
-          if ($cache = cache_get($cid, 'cache_publizon_loans')) {
-            $content = $cache->data;
+          try {
+            $publizon_loans = new PublizonUserLoans($uid, TRUE);
+            $content = theme('publizon_loans_list', $publizon_loans->loans);
           }
-          else {
-            try {
-              $publizon_loans = new PublizonUserLoans($uid, TRUE);
-              $content = theme('publizon_loans_list', $publizon_loans->loans);
-
-              // Store the content in cache (30 min). We cache the content as
-              // the theme function above needs information from the datawell to
-              // ensure that the product is available (the action links).
-              if (!$_SESSION['by_pass_cache']) {
-                cache_set($cid, $content, 'cache_publizon_loans', time() + 1800);
-              }
-            }
-            catch (Exception $e) {
-              drupal_set_message($e->getMessage(), 'error');
-            }
+          catch (Exception $e) {
+            drupal_set_message($e->getMessage(), 'error');
           }
         }
 
