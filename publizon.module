@@ -226,11 +226,6 @@ function template_preprocess_publizon_actions(&$vars) {
           '#class' => 'sample',
           '#weight' => -10,
         );
-        $actions[] = array(
-          '#link' => l(t('Loan'), 'publizon/' . $isbn . '/download', array('html' => TRUE,  'attributes' => array('class' => 'loan', 'action' => 'download'))),
-          '#class' => 'loan',
-          '#weight' => -5,
-        );
       }
       else {
         // The book dosen't have a sample link, hence can't be downloaded.
