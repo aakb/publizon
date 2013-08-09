@@ -15,6 +15,7 @@
 class PublizonLoan extends Publizon {
   protected $properties = array(
     'isbn' => NULL,
+    'internal_order_number' => NULL,
     'retailer_order_number' => NULL,
     'status' => NULL,
     'order_date' => NULL,
@@ -97,6 +98,7 @@ class PublizonLoan extends Publizon {
 
     $this->isbn = (string)$item->book->attributes()->id;
     $this->retailer_order_number = (string)$item->retailerordernumber;
+    $this->internal_order_number = (string)$item->internalordernumber;
     $this->status = (string)$item->orderstatus->attributes()->name;
     $this->order_date = strtotime((string)$item->orderdate);
     $this->expire_date = strtotime((string)$item->loanexpiredate);

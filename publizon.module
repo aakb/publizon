@@ -206,11 +206,8 @@ function template_preprocess_publizon_actions(&$vars) {
   switch ($vars['type']) {
     // User loan list
     case 'loan':
-      $actions[] =  array(
-        '#link' => l(t('Download'), 'publizon/' . $isbn . '/download', array('html' => TRUE, 'attributes' => array('class' => 'loan', 'action' => 'download'))),
-        '#class' => 'download',
-        '#weight' => 2,
-      );
+      // Should be handel by the sites as eReolen no longer supports download
+      // (only streaming).
       break;
 
     // Cart list on the user page (should not have a break statement).
@@ -228,11 +225,6 @@ function template_preprocess_publizon_actions(&$vars) {
           '#link' => l(t('Sample'), $vars['product']->teaser_link, array('html' => TRUE, 'attributes' => array('target' => '_blank', 'action' => 'sample'))),
           '#class' => 'sample',
           '#weight' => -10,
-        );
-        $actions[] = array(
-          '#link' => l(t('Loan'), 'publizon/' . $isbn . '/download', array('html' => TRUE,  'attributes' => array('class' => 'loan', 'action' => 'download'))),
-          '#class' => 'loan',
-          '#weight' => -5,
         );
       }
       else {

@@ -7,7 +7,7 @@
 <div>
   <div class="left">
     <div class="picture">
-      <a href=""><img title="" alt="" src="<?php echo $loan->product->getCover('65_x'); ?>" /></a>
+      <a href="<?php echo url("ting/object/" . $loan->product->getTingObject()->id) ?>"><img title="" alt="" src="<?php echo $loan->product->getCover('65_x'); ?>" /></a>
     </div>
   </div>
   <div class="right">

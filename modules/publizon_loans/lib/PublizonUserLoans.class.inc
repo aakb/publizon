@@ -92,7 +92,7 @@ class PublizonUserLoans extends Publizon {
    * @param string $isbn
    *  ISBN of the loan to check.
    * @param boolean $expired
-   *  If TRUE the loan is also have to not be expired to be a loan.
+   *  If TRUE the loan must have not be expired to be a loan.
    * @return boolean
    *  TRUE if the user have the loan else FALSE.
    */
