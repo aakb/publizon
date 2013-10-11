@@ -21,18 +21,18 @@ function publizon_library_flush_caches() {
  * and returns the library names indexed by retailer id.
  *
  * @staticvar array $retailers
- *  Static cache used to speed-up the search if call more than once.
+ *   Static cache used to speed-up the search if call more than once.
  * @param bool $reset
- *  If TRUE the static cache will be rebuild. Defaults to FALSE.
+ *   If TRUE the static cache will be rebuild. Defaults to FALSE.
  * @return array
- *  Library names indexed by retailer id.
+ *   Library names indexed by retailer id.
  */
 function publizon_get_libraries($reset = FALSE) {
   static $retailers;
   if (!isset($retailers) || $reset) {
     $publizon = variable_get('publizon', array());
     if (empty($publizon) || !isset($publizon['libraries']) || !count($publizon['libraries'])) {
-      // We are missing som library configureation here.
+      // We are missing som library configuration here.
       drupal_set_message(t('You need to login as administrtor and configure Publizon library lists'), 'warning', FALSE);
       return array();
     }
@@ -57,22 +57,24 @@ function publizon_get_libraries($reset = FALSE) {
  * library and return the information as an array. The array contains
  * retailer_id, retailer_key_code and library_name.
  *
- * @staticvar type $libraries
- *  Static cache used to speed-up the search if call more than once.
- * @param type $retailer_id
- *  Retailer id that identifies the library at Publizon.
- * @param type $reset
- *  If TRUE the static cache will be rebuild. Defaults to FALSE.
+ * @staticvar array $libraries
+ *   Static cache used to speed-up the search if call more than once.
+ *
+ * @param string $retailer_id
+ *   Retailer id that identifies the library at Publizon.
+ * @param bool $reset
+ *   If TRUE the static cache will be rebuild. Defaults to FALSE.
+ *
  * @return array
- *  Basic information about the library entered at the publizon administration
- *  interface.
+ *   Basic information about the library entered at the publizon administration
+ *   interface.
  */
 function publizon_get_library($retailer_id, $reset = FALSE) {
   static $libraries;
   if (!isset($libraries) || !isset($libraries[$retailer_id]) || $reset) {
     $publizon = variable_get('publizon', array());
     if (empty($publizon) || !isset($publizon['libraries']) || !count($publizon['libraries'])) {
-      // We are missing som library configureation here.
+      // We are missing som library configuration here.
       drupal_set_message(t('You need to login as administrtor and configure Publizon library lists'), 'warning', FALSE);
       return array();
     }

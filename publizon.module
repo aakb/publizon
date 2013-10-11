@@ -74,7 +74,7 @@ function publizon_theme() {
 }
 
 /**
- * Implements hook_elsements().
+ * Implements hook_elements().
  *
  * Defines custom form element which is used by the administration form to
  * handle library information.
@@ -114,7 +114,7 @@ function publizon_library_field_process($element, $edit, &$form_state, $complete
 
 /**
  * Implementation of the library field validation function. It ensures that all
- * input fields contains data befor submitting the element.
+ * input fields contains data before submitting the element.
  *
  * @see publizon_elements()
  */
@@ -201,7 +201,6 @@ function publizon_block($op = 'list', $delta = 0) {
  *
  */
 function template_preprocess_publizon_actions(&$vars) {
-  $isbn = $vars['product']->isbn;
   $actions = array();
   switch ($vars['type']) {
     // User loan list
@@ -291,7 +290,7 @@ function publizon_get_authors($ting_object, $link = TRUE) {
 }
 
 /**
- * Search the T!NG datawell for information based on the ISBN parsed to the
+ * Search the T!NG data well for information based on the ISBN parsed to the
  * function. If more than one match is found only the first match is returned.
  *
  * @param string $isbn
@@ -312,7 +311,7 @@ function publizon_ting_find_object($isbn) {
   // Try to fetch ting object based on ISBN number. Sadly not all object in
   // ebooks or net sound have ISBN, but uses oss:PROVIDER-ID, which we can not
   // search directly on (so no dc.identificer=*). Also therefor it have been
-  // reanemd, because it dose not only find object by ISBN.
+  // renamed, because it dose not only find object by ISBN.
   $request->setQuery($isbn);
   $request->setNumResults(1);
 
