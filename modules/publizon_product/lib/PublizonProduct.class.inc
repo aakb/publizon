@@ -176,7 +176,7 @@ class PublizonProduct extends Publizon {
     else {
       // Check if the image should be re-downloaded (approx. every 24 hours).
       $created = filectime($path);
-      if ($created > time() - 43200) {
+      if ($created < time() - 43200) {
         // Remove image from the filesystem and imagecache.
         unlink($path);
         imagecache_image_flush($path);
