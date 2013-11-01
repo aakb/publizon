@@ -129,7 +129,7 @@ class PublizonProduct extends Publizon {
    * and stores it locally.
    *
    * @param string $url
-   *   The localtion from where to fetch the cover image.
+   *   The location from where to fetch the cover image.
    *
    * @return string
    *   The local path where the image is located.
@@ -175,14 +175,14 @@ class PublizonProduct extends Publizon {
     }
     else {
       // Check if the image should be re-downloaded (approx. every 24 hours).
-      $created = filectime($path);
+      $created = filemtime($path);
       if ($created < time() - 43200) {
-        // Remove image from the filesystem and imagecache.
+        // Remove image from the filesystem and image cache.
         unlink($path);
         imagecache_image_flush($path);
 
         // Call the download load function once more to re-download the image.
-        $this->downloadImage($this->cover_download_url);
+        $this->downloadImage($src);
       }
     }
 
