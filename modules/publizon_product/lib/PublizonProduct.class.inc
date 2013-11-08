@@ -233,8 +233,8 @@ class PublizonProduct extends Publizon {
     $this->categories = $categories;
 
     // Download image here or in __get
-    $this->cover = $this->fetchCover((string) $xml->coverimage);
-    $this->cover_download_url = (string) $xml->coverimage;
+    $this->cover = $this->fetchCover((string) $xml->thumbnailimage);
+    $this->cover_download_url = (string) $xml->thumbnailimage;
   }
 }
 
