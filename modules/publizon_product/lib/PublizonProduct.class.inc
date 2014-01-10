@@ -25,6 +25,7 @@ class PublizonProduct extends Publizon {
     'teaser_link' => NULL,
     'isbn' => NULL,
     'author' => NULL,
+    'format_id' => NULL,
     'format' => NULL,
     'bytes' => NULL,
     'duration' => NULL,
@@ -41,8 +42,9 @@ class PublizonProduct extends Publizon {
   private $ting_object = NULL;
 
   /**
-   * Constructor that takes a ISBN and fetches the product from Publizon if the
-   * information is not located the product cache.
+   * Constructor that takes a ISBN and fetches the product from Publizon.
+   *
+   * If the information is not located the product cache.
    *
    * @param string $isbn
    *   ISBN to identify the product.
@@ -78,8 +80,9 @@ class PublizonProduct extends Publizon {
   }
 
   /**
-   * Returns the cover image through an image cache preset. If the full size or
-   * raw cover image is needed simple call: $product->cover.
+   * Returns the cover image through an image cache preset.
+   *
+   * If the full size or raw cover image is needed simple call: $product->cover.
    *
    * If the product do not have a cover image a default one located in the files
    * folder name default_cover.jpg will be used.
@@ -117,19 +120,41 @@ class PublizonProduct extends Publizon {
    */
   public function getTingObject() {
     if (!isset($this->ting_object)) {
-      // If not fetched in this http request, search the data well for the product.
+      // If not fetched in this http request, search the data well for the
+      // product.
       $this->ting_object = publizon_ting_find_object($this->isbn);
     }
     return $this->ting_object;
   }
 
+  /**
+   * Get the e-books file format.
+   *
+   * @return mixed
+   *   The name of the format. If unknown format FALSE is returned.
+   */
+  public function getFormat() {
+    $format = FALSE;
+    switch ($this->format_id) {
+      case '50':
+        $format = 'PDF';
+        break;
+
+      case '58':
+        $format = 'EPUB';
+        break;
+    }
+
+    return $format;
+  }
 
   /**
-   * Wrapper function that fetch the product cover (image) from the web-service
-   * and stores it locally.
+   * Wrapper function that fetch the product cover (image).
+   *
+   * It's fetched from the web-service and stored locally.
    *
    * @param string $url
-   *   The localtion from where to fetch the cover image.
+   *   The location from where to fetch the cover image.
    *
    * @return string
    *   The local path where the image is located.
@@ -175,14 +200,14 @@ class PublizonProduct extends Publizon {
     }
     else {
       // Check if the image should be re-downloaded (approx. every 24 hours).
-      $created = filectime($path);
-      if ($created > time() - 43200) {
-        // Remove image from the filesystem and imagecache.
+      $created = filemtime($path);
+      if ($created < time() - 43200) {
+        // Remove image from the filesystem and image cache.
         unlink($path);
         imagecache_image_flush($path);
 
         // Call the download load function once more to re-download the image.
-        $this->downloadImage($this->cover_download_url);
+        $this->downloadImage($src);
       }
     }
 
@@ -218,6 +243,7 @@ class PublizonProduct extends Publizon {
       'firstname' => (string) $xml->contributors->first_name,
       'lastname' => (string ) $xml->contributors->family_name,
     );
+    $this->format_id = (string) $xml->formats->format_id;
     $this->format = (string) $xml->formats->name;
     $this->bytes = (string) $xml->formats->size_bytes;
     $this->duration = (string) $xml->formats->duration_minutes;
@@ -233,8 +259,8 @@ class PublizonProduct extends Publizon {
     $this->categories = $categories;
 
     // Download image here or in __get
-    $this->cover = $this->fetchCover((string) $xml->coverimage);
-    $this->cover_download_url = (string) $xml->coverimage;
+    $this->cover = $this->fetchCover((string) $xml->thumbnailimage);
+    $this->cover_download_url = (string) $xml->thumbnailimage;
   }
 }
 

@@ -27,7 +27,7 @@ abstract class Publizon {
    */
   public function __set($name, $value) {
     if (array_key_exists($name, $this->properties)) {
-      $this->properties[$name]= $value;
+      $this->properties[$name] = $value;
     }
     else {
       throw new PublizonLoansException('Trying to set publizon loans property that do not exists (' . $name . ').');
