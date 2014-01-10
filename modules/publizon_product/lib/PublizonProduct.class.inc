@@ -127,10 +127,31 @@ class PublizonProduct extends Publizon {
     return $this->ting_object;
   }
 
+  /**
+   * Get the e-books file format.
+   *
+   * @return mixed
+   *   The name of the format. If unknown format FALSE is returned.
+   */
+  public function getFormat() {
+    $format = FALSE;
+    switch ($this->format_id) {
+      case '50':
+        $format = 'PDF';
+        break;
+
+      case '58':
+        $format = 'EPUB';
+        break;
+    }
+
+    return $format;
+  }
 
   /**
-   * Wrapper function that fetch the product cover (image) from the web-service
-   * and stores it locally.
+   * Wrapper function that fetch the product cover (image).
+   *
+   * It's fetched from the web-service and stored locally.
    *
    * @param string $url
    *   The location from where to fetch the cover image.
@@ -222,7 +243,7 @@ class PublizonProduct extends Publizon {
       'firstname' => (string) $xml->contributors->first_name,
       'lastname' => (string ) $xml->contributors->family_name,
     );
-    $this->format_id = (string) $xml->formats->name_id;
+    $this->format_id = (string) $xml->formats->format_id;
     $this->format = (string) $xml->formats->name;
     $this->bytes = (string) $xml->formats->size_bytes;
     $this->duration = (string) $xml->formats->duration_minutes;
