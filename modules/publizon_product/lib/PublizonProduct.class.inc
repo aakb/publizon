@@ -25,6 +25,7 @@ class PublizonProduct extends Publizon {
     'teaser_link' => NULL,
     'isbn' => NULL,
     'author' => NULL,
+    'format_id' => NULL,
     'format' => NULL,
     'bytes' => NULL,
     'duration' => NULL,
@@ -41,8 +42,9 @@ class PublizonProduct extends Publizon {
   private $ting_object = NULL;
 
   /**
-   * Constructor that takes a ISBN and fetches the product from Publizon if the
-   * information is not located the product cache.
+   * Constructor that takes a ISBN and fetches the product from Publizon.
+   *
+   * If the information is not located the product cache.
    *
    * @param string $isbn
    *   ISBN to identify the product.
@@ -78,8 +80,9 @@ class PublizonProduct extends Publizon {
   }
 
   /**
-   * Returns the cover image through an image cache preset. If the full size or
-   * raw cover image is needed simple call: $product->cover.
+   * Returns the cover image through an image cache preset.
+   *
+   * If the full size or raw cover image is needed simple call: $product->cover.
    *
    * If the product do not have a cover image a default one located in the files
    * folder name default_cover.jpg will be used.
@@ -117,7 +120,8 @@ class PublizonProduct extends Publizon {
    */
   public function getTingObject() {
     if (!isset($this->ting_object)) {
-      // If not fetched in this http request, search the data well for the product.
+      // If not fetched in this http request, search the data well for the
+      // product.
       $this->ting_object = publizon_ting_find_object($this->isbn);
     }
     return $this->ting_object;
@@ -218,6 +222,7 @@ class PublizonProduct extends Publizon {
       'firstname' => (string) $xml->contributors->first_name,
       'lastname' => (string ) $xml->contributors->family_name,
     );
+    $this->format_id = (string) $xml->formats->name_id;
     $this->format = (string) $xml->formats->name;
     $this->bytes = (string) $xml->formats->size_bytes;
     $this->duration = (string) $xml->formats->duration_minutes;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Defines the comunication client to use with the Publizon client. It makes
+ * Defines the communication client to use with the Publizon client. It makes
  * some overrides of the default NanoSOAPClient implementation.
  */
 
@@ -11,23 +11,27 @@
 class PublizonNanoSOAPClient extends NanoSOAPClient {
 
   /**
-   * Default construtor.
+   * Default constructor.
    */
-  function __construct($endpoint, $options = array()) {
+  public function __construct($endpoint, $options = array()) {
     parent::__construct($endpoint, $options);
   }
 
   /**
-   * Make a SOAP request. Modified this verion to new set a SOAP action header
-   * as publizon's service don't link that
+   * Make a SOAP request.
    *
+   * Modified this version to new set a SOAP action header as publizon's service
+   * don't link that
+   *
+   * @param string $action
+   *   The method/action to be called.
    * @param array $parameters
    *   The parameters to send with the SOAP request.
    *
    * @return string
    *   The SOAP response.
    */
-  function call($action, $parameters = array()) {
+  public function call($action, $parameters = array()) {
     // Set content type and send the SOAP action as a header.
     $headers = array(
       'Content-Type: text/xml',

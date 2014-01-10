@@ -44,13 +44,13 @@ class PublizonClient {
    * form.
    *
    * @param string $retailer_id
-   *  An id that represents the library at publizon.
+   *   An id that represents the library at publizon.
    * @param string $retailer_key_code
-   *  An hash value validating the library as publizon.
+   *   An hash value validating the library as publizon.
    * @param string $langcode
-   *  The language code used to fetch the information ('da').
+   *   The language code used to fetch the information ('da').
    * @param PublizonLogger $logger
-   *  Publizon logger class.
+   *   Publizon logger class.
    */
   private function __construct($retailer_id, $retailer_key_code, $langcode, $logger) {
     // Get publizon settings from the administration interface.
@@ -86,13 +86,13 @@ class PublizonClient {
    * @see PublizonClient().
    *
    * @param string $retailer_id
-   *  An id that represents the library at publizon.
+   *   An id that represents the library at publizon.
    * @param string $retailer_key_code
-   *  An hash value validating the library as publizon.
+   *   An hash value validating the library as publizon.
    * @param string $langcode
-   *  The language code used to fetch the information ('da').
+   *   The language code used to fetch the information ('da').
    * @param PublizonLogger $logger
-   *  Publizon logger class.
+   *   Publizon logger class.
    */
   public static function getClient($retailer_id = NULL, $retailer_key_code = NULL, $langcode = NULL, $logger = NULL) {
     if (!isset(self::$instance)) {
@@ -106,19 +106,21 @@ class PublizonClient {
    * Create a new loan at Publizon. It throws an exception if the loan does not
    * go through else a download url is returned.
    *
-   * @param type $card_number
-   *  The users cardnumber/CPR also known as login id.
-   * @param type $pincode
-   *  The users login pincode.
-   * @param type $isbn
-   *  ISBN number on the product.
+   * @param string $card_number
+   *   The users card number/CPR also known as login id.
+   * @param string $pincode
+   *   The users login pin code.
+   * @param string $isbn
+   *   ISBN number on the product.
+   *
    * @return string
-   *  Download URL to the product.
+   *   Download URL to the product.
+   *
    * @throws PublizonException
    */
   public function createLoan($card_number, $pincode, $isbn) {
     // Make request to the web-service for the loan. It throws an exception if
-    // the loan failes.
+    // the loan fails.
     $response = $this->call('loan', 'CreateLoan', array(
       'pub:ebookid' => $isbn,
       'pub:cardnumber' => $card_number,
@@ -128,7 +130,7 @@ class PublizonClient {
     $data = $response->xpath('//data');
     if (isset($data[0])) {
       $data = $data[0];
-      return (string)$data->downloadurl;
+      return (string) $data->downloadurl;
     }
 
     $this->logger->log('Create loan request returned no data (' . $isbn . ').', 'ERROR');
@@ -150,12 +152,16 @@ class PublizonClient {
    *       the response.
    *
    * @param int $list_type
-   *  This can either be PUBLIZON_EBOOK or PUBLIZON_NETSOUND.
+   *   This can either be PUBLIZON_EBOOK or PUBLIZON_NETSOUND.
    * @param int $limit
-   *  The number of products that should be returned. If the limit can not be
-   *  reached, the number available will be returned.
+   *   The number of products that should be returned. If the limit can not be
+   *   reached, the number available will be returned.
+   *
+   * @return array
+   *   Array with PublizonProduct objects
+   *
    * @throws PublizonException
-   *  Will be throw if the list type is unknown.
+   *   Will be throw if the list type is unknown.
    */
   public function getLastLoansForAll($list_type, $limit = 7) {
     if ($list_type == PUBLIZON_EBOOK || $list_type == PUBLIZON_NETSOUND) {
@@ -172,7 +178,7 @@ class PublizonClient {
       if (isset($data[0])) {
         $data = $data[0];
         foreach ($data->orderinformationitem as $item) {
-          $product = new PublizonProduct((string)$item->identifier);
+          $product = new PublizonProduct((string) $item->identifier);
           if (isset($product->status)) {
             $products[] = $product;
             $items_found++;
@@ -195,15 +201,17 @@ class PublizonClient {
   }
 
   /**
-   * Retrives information about the user loans stored at Publizon.
+   * Retrieves information about the user loans stored at Publizon.
    *
    * @param string $card_number
-   *  User card_number / CPR also known as login id.
+   *   User card_number / CPR also known as login id.
    * @param string $list_type
-   *  This can either be PUBLIZON_EBOOK or PUBLIZON_NETSOUND.
-   * @return boolean
-   *  Returns an array with general information about the user and the user
-   *  loans. If no information is returned from the web-service FALSE.
+   *   This can either be PUBLIZON_EBOOK or PUBLIZON_NETSOUND.
+   *
+   * @return bool
+   *   Returns an array with general information about the user and the user
+   *   loans. If no information is returned from the web-service FALSE.
+   *
    * @throws PublizonException
    */
   public function getLibraryUserOrderList($card_number, $list_type) {
@@ -229,16 +237,19 @@ class PublizonClient {
   }
 
   /**
-   * Fetch XML representation for a product at publizon. You should not use this
-   * function directly, but simple create a new PublizonProduct object. Which
-   * will automatically fectch the product through this function.
+   * Fetch XML representation for a product at publizon.
+   *
+   * You should not use this function directly, but simple create a new
+   * PublizonProduct object. Which will automatically fetch the product through
+   * this function.
    *
    * @see PublizonProduct()
    *
    * @param string $isbn
-   *  Product id also know as ISBN number.
+   *   Product id also know as ISBN number.
+   *
    * @return SimpleXmlElement
-   *  Raw XML object containing the product.
+   *   Raw XML object containing the product.
    */
   public function getProduct($isbn) {
     // Get product form the web-serivce.
@@ -269,7 +280,12 @@ class PublizonClient {
    * web-service.
    *
    * @param string $card_number
+   *   User card_number / CPR also known as login id.
    * @param string $pincode
+   *   The users pin code.
+   *
+   * @return bool
+   *   If the user is valid TRUE is return else FALSE.
    */
   public function validateLibraryUser($card_number, $pincode) {
     try {
@@ -288,22 +304,24 @@ class PublizonClient {
     // sessions will be used for logged in user any way.
     $data = $response->xpath('//data');
     $_SESSION['by_pass_cache'] = FALSE;
-    if ((string)$data[0]->testcard == 'true') {
+    if ((string) $data[0]->testcard == 'true') {
       $_SESSION['by_pass_cache'] = TRUE;
     }
     return TRUE;
   }
 
   /**
-   * Get basic information about a given library as registrated at Publizon. It
-   * will fallback on the clients retailer id and retailer key code defined in
-   * the current instance of the client if non is given as arguments.
+   * Get basic information about a given library as registered at Publizon.
+   *
+   * It will fallback on the clients retailer id and retailer key code defined
+   * in the current instance of the client if non is given as arguments.
    *
    * @param string $retailer_id
-   *  The librarys ID at Publizon.
+   *   The libraries ID at Publizon.
    * @param string $retailer_key_code
-   *  The librarys access code at Publizon.
-   * @return boolean
+   *   The libraries access code at Publizon.
+   *
+   * @return bool
    */
   public function getLibraryProfile($retailer_id = NULL, $retailer_key_code = NULL) {
     // Try to get parameters and fallback to default.
@@ -331,24 +349,25 @@ class PublizonClient {
    * NanoSOAP module.
    *
    * @param string $endpoint
-   *  Index into the end-points array (defined in the top of the object).
+   *   Index into the end-points array (defined in the top of the object).
    * @param string $action
-   *  SOAP action to request.
+   *   SOAP action to request.
    * @param array $parameters
-   *  The parameters to call the actions with. Also known as the content of the
-   *  message. Remember to prefix them with the namespace they should use.
+   *   The parameters to call the actions with. Also known as the content of the
+   *   message. Remember to prefix them with the namespace they should use.
    * @param array $namespace
-   *  The namespaces that is used inside the SOAP message.
+   *   The namespaces that is used inside the SOAP message.
+   *
    * @return SimpleXMLElement
-   *  The response from the web-service.
+   *   The response from the web-service.
    *
    * @throws PublizonConnectionException
-   *  If the connection fails.
+   *   If the connection fails.
    * @throws PublizonException
-   *  If the response dose not have a 101 status.
+   *   If the response dose not have a 101 status.
    */
   private function call($endpoint, $action, $parameters, $namespace) {
-    // Log request
+    // Log request.
     $this->logger->log('Call to "' . $this->end_points[$endpoint] . '" for "' . $action . '"');
 
     // Get namespace key.
@@ -368,17 +387,17 @@ class PublizonClient {
       $response = simplexml_load_string($response);
     }
     catch (Exception $e) {
-      // Connection faild.
-      throw new PublizonConnectionException('Connection with the Publizon web-service failed.');
+      // Connection error.
       $this->logger->log('Connection with the Publizon web-service failed.');
+      throw new PublizonConnectionException('Connection with the Publizon web-service failed.');
     }
 
     // Check the response error codes.
     $status = $response->xpath('//status');
     if (isset($status[0]) && $status[0]->code != 101) {
       // Throw exception, it's translated in the exception.
-      throw new PublizonException($status[0]->message, intval($status[0]->code));
       $this->logger->log(check_plain($status[0]->message()));
+      throw new PublizonException($status[0]->message, intval($status[0]->code));
     }
 
     return $response;
@@ -389,16 +408,17 @@ class PublizonClient {
    * web-service. If value is given it's used, if non is given the session will
    * be checked and then the default configuration.
    *
-   * Data in the session indicates that the current use is logged in, henc this
+   * Data in the session indicates that the current use is logged in, hence this
    * should be used.
    *
    * @param string $name
-   *  Name of the setting that should be set.
+   *   Name of the setting that should be set.
    * @param string $value
-   *  The value that should be set.
+   *   The value that should be set.
+   *
    * @throws PublizonException
-   *  If the function falls back to using administration setting and this could
-   *  not be found exception is throw.
+   *   If the function falls back to using administration setting and this could
+   *   not be found exception is throw.
    */
   private function setSetting($name, $value = NULL) {
     if (isset($value)) {
@@ -418,18 +438,20 @@ class PublizonClient {
 }
 
 /**
- * Custom Excetion that ensures that the string given is checked and
- * translatable in the frontned.
+ * Custom Exception that ensures that the string given is checked and
+ * translatable in the front ned.
  *
- * All other Excetion class should use this as their base class.
+ * All other Exception class should use this as their base class.
  */
 class PublizonException extends Exception {
-  // Create new constructor that ensure message is tranlated.
+  /**
+   * Create new constructor that ensure message is translated.
+   */
   public function __construct($message, $code = 0, Exception $previous = NULL) {
     // Add support for tranlation.
     $message = t(check_plain($message));
 
-    // Make sure everything is assigned properly
+    // Make sure everything is assigned properly.
     parent::__construct($message, $code, $previous);
   }
 }
