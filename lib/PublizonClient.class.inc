@@ -33,7 +33,7 @@ class PublizonClient {
   private static $instance = NULL;
 
   /**
-   * Class construtor that prepares an connection to publizon and wrappers all
+   * Class constructor that prepares an connection to publizon and wrappers all
    * calls into this object. This is a private constructor as the object is
    * implemented as a singleton pattern, use PublizonClient::getClient() to get
    * an instance.
@@ -345,7 +345,7 @@ class PublizonClient {
   }
 
   /**
-   * Wrapper function for preforming af call to Publizon's web-service via the
+   * Wrapper function for preforming of call to Publizon's web-service via the
    * NanoSOAP module.
    *
    * @param string $endpoint
@@ -395,8 +395,14 @@ class PublizonClient {
     // Check the response error codes.
     $status = $response->xpath('//status');
     if (isset($status[0]) && $status[0]->code != 101) {
+      if (isset($status[0]->message)) {
+        $this->logger->log(check_plain($status[0]->message));
+      }
+      else {
+        $this->logger->log('Connection with the Publizon web-service failed.');
+      }
+
       // Throw exception, it's translated in the exception.
-      $this->logger->log(check_plain($status[0]->message()));
       throw new PublizonException($status[0]->message, intval($status[0]->code));
     }
 
