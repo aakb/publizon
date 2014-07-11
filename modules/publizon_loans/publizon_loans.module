@@ -6,10 +6,6 @@
  * user loans.
  */
 
-function publizon_loans_perm() {
-
-}
-
 /**
  * Implements hook_theme().
  */
@@ -29,7 +25,7 @@ function publizon_loans_theme() {
 }
 
 /**
- * Implementation of hook_block().
+ * Implements hook_block().
  */
 function publizon_loans_block($op = 'list', $delta = 0, $edit = array()) {
   $block = array();
