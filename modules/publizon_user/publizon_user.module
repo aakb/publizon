@@ -8,38 +8,39 @@
  */
 
 /**
- * Implement hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Alter the login page and login block changing the fields and adding custom
  * validation function to handle authentication with publizon.
  */
 function publizon_user_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'user_login' || $form_id == 'user_login_block') {
-      // Login form found, so change labels and description.
-      $form['name']['#prefix'] = '<h1>' . t('Welcome to Netlydbog.dk') . '</h1><p>' . t('We noticed that you are not logged in.') . '</p><p>' . t('Please fill in your CPR number + pincode to login.') . '</p>';
-      $form['name']['#title'] = t('CPR number');
-      $form['pass']['#title'] = t('Pincode');
-      $form['name']['#type'] = 'password';
+    // Login form found, so change labels and description.
+    $form['name']['#prefix'] = '<h1>' . t('Welcome to Netlydbog.dk') . '</h1><p>' . t('We noticed that you are not logged in.') . '</p><p>' . t('Please fill in your CPR number + pincode to login.') . '</p>';
+    $form['name']['#title'] = t('CPR number');
+    $form['pass']['#title'] = t('Pincode');
+    $form['name']['#type'] = 'password';
 
-      // Remove descriptions from the login fields.
-      unset($form['name']['#description']);
-      unset($form['pass']['#description']);
+    // Remove descriptions from the login fields.
+    unset($form['name']['#description']);
+    unset($form['pass']['#description']);
 
-      // Selection of library to the form.
-      $form['retailer_id'] = array(
-        '#type' => 'select',
-        '#title' => t('Dit bibliotek'),
-        '#options' => publizon_get_libraries(),
-      );
+    // Selection of library to the form.
+    $form['retailer_id'] = array(
+      '#type' => 'select',
+      '#title' => t('Dit bibliotek'),
+      '#options' => publizon_get_libraries(),
+    );
 
-      // Add validation function to the front of validation array.
-      array_unshift($form['#validate'], 'publizon_user_login_validate');
+    // Add validation function to the front of validation array.
+    array_unshift($form['#validate'], 'publizon_user_login_validate');
   }
 }
 
 /**
- * Validation function for the login form alter above. The user is validated
- * against the Publizon web-service.
+ * Validation function for the login form alter above.
+ *
+ * The user is validated against the Publizon web-service.
  *
  * @todo: Make the the redirect configurable.
  */
@@ -70,9 +71,10 @@ function publizon_user_login_validate($form, &$form_state) {
  * @todo: Moved seed value into settings.php and upgraded to SHA function.
  *
  * @param string $login_id
- *  This should be the users login id (card number or CPR).
+ *   This should be the users login id (card number or CPR).
+ *
  * @return string
- *  MD5 seeded value of the login id.
+ *   MD5 seeded value of the login id.
  */
 function publizon_user_encode_pid($login_id) {
   return md5(drupal_get_private_key() . $login_id);
@@ -88,14 +90,14 @@ function publizon_user_encode_pid($login_id) {
  * @return object $user if success or FALSE on failur.
  */
 function publizon_user_authentication($login_id, $pass, $retailer_id) {
-  // Get informtaion about the libray the user have selected on the login page
+  // Get information about the library the user have selected on the login page
   // and get a connection to Publizon base on that information.
   $library = publizon_get_library($retailer_id);
   $client = PublizonClient::getClient($retailer_id, $library['retailer_key_code']);
 
   // Validate the user.
   if ($client->validateLibraryUser($login_id, $pass)) {
-    // Store login information need to communicat with Publizon in the users
+    // Store login information need to communicate with Publizon in the users
     // current session.
     $_SESSION['login_id'] = $login_id;
     $_SESSION['pass'] = $pass;
@@ -113,7 +115,8 @@ function publizon_user_authentication($login_id, $pass, $retailer_id) {
         'name' => $random_name,
         'display_name' => t('Publizon user'),
         'mail' => $random_name . '@mail.invalid',
-        'pass' => microtime(TRUE) . mt_rand(), // Login via Drupal's standard login should not be possible.
+        // Login via Drupal's standard login should not be possible.
+        'pass' => microtime(TRUE) . mt_rand(),
         'status' => 1,
       );
 
@@ -126,7 +129,7 @@ function publizon_user_authentication($login_id, $pass, $retailer_id) {
 
       // Store user reference in our own table.
       db_query("INSERT INTO {publizon_user} (uid, pid, retailer_id)
-                     VALUES (%d, '%s', '%s');", $account->uid, publizon_user_encode_pid($login_id), $retailer_id);
+                VALUES (%d, '%s', '%s');", $account->uid, publizon_user_encode_pid($login_id), $retailer_id);
     }
     return $account;
   }
@@ -140,9 +143,10 @@ function publizon_user_authentication($login_id, $pass, $retailer_id) {
  * It has support for the old encoding of the user ids.
  *
  * @param string $login_id
- *  Login id provided by the current user (it can be either cardno or CPR).
+ *   Login id provided by the current user (it can be either cardno or CPR).
  * @param string $retailer_id
- *  Publizon retailer id the represents a library.
+ *   Publizon retailer id the represents a library.
+ *
  * @return type
  */
 function publizon_user_load_account($login_id, $retailer_id) {
@@ -171,9 +175,9 @@ function publizon_user_load_account($login_id, $retailer_id) {
 }
 
 /**
- * Implementation of hook_block().
+ * Implements hook_block().
  *
- * Implemnets the blocks thats mainly is located on the "my page" panel after
+ * Implements the blocks that's mainly is located on the "my page" panel after
  * the user is logged in. If you are looking for my loans look in
  * publizon_loans.
  */
@@ -232,7 +236,13 @@ function publizon_user_block($op = 'list', $delta = 0) {
         case 'logout':
           $content = '';
           if ($user->uid) {
-            $content = '<p>' . t('You are logged in: !link', array('!link' => l(t('Logout'), 'logout', array('attributes' => array('class' => 'logout-button'))))) . '</p>';
+            $content = '<p>' . t('You are logged in: !link', array(
+                '!link' => l(t('Logout'),
+                'logout', array(
+                  'attributes' => array(
+                    'class' => 'logout-button',
+                  ),
+                )))) . '</p>';
           }
           $block = array(
             'subject' => t('My profile'),
@@ -246,13 +256,14 @@ function publizon_user_block($op = 'list', $delta = 0) {
 
 
 /**
- * Test if the current user is logged into Publizon. The user may be a normal
- * Drupal user.
+ * Test if the current user is logged into Publizon.
+ *
+ * The user may be a normal Drupal user.
  *
  * @global object $user
  *
  * @return mixed
- *  Drupal uid if the user is logged in else FALSE.
+ *   Drupal uid if the user is logged in else FALSE.
  */
 function publizon_user_is_logged_in() {
   global $user;
@@ -266,8 +277,8 @@ function publizon_user_is_logged_in() {
  * Gets the current users login credentials.
  *
  * @return mixed
- *  If the current user is logged in a keyed array with information is returned
- *  else FALSE.
+ *   If the current user is logged in a keyed array with information is returned
+ *   else FALSE.
  */
 function publizon_user_get_credentials() {
   if (publizon_user_is_logged_in()) {
