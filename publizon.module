@@ -6,7 +6,7 @@
  */
 
 /**
- * Define constances used in the client to indicate, which type of data we are
+ * Define constance used in the client to indicate, which type of data we are
  * looking for.
  *
  * @see PublizonClient->getgetLastLoansForAll()
@@ -15,7 +15,7 @@ define('PUBLIZON_EBOOK', 1);
 define('PUBLIZON_NETSOUND', 2);
 
 /**
- * Define constances used to detect the users current device platform.
+ * Define constance used to detect the users current device platform.
  */
 define('PUBLIZON_PLATFORM_GENERIC', 1);
 define('PUBLIZON_PLATFORM_IOS', 2);
@@ -69,7 +69,7 @@ function publizon_theme() {
     'publizon_actions' => array(
       'arguments' => array('product' => NULL, 'type' => 'default'),
       'template' => 'templates/publizon-actions',
-    )
+    ),
   );
 }
 
@@ -113,15 +113,16 @@ function publizon_library_field_process($element, $edit, &$form_state, $complete
 }
 
 /**
- * Implementation of the library field validation function. It ensures that all
- * input fields contains data before submitting the element.
+ * Implementation of the library field validation function.
+ *
+ * It ensures that all input fields contains data before submitting the element.
  *
  * @see publizon_elements()
  */
 function publizon_library_field_validate($element, &$form_state) {
   // First is to get the remove one more to work.
   if (!empty($element['#value']['retailer_id'])) {
-    if (!is_numeric($element['#value']['retailer_id']) || (int)$element['#value']['retailer_id'] < 0) {
+    if (!is_numeric($element['#value']['retailer_id']) || (int) $element['#value']['retailer_id'] < 0) {
       form_error($element, t('!field have to be an interger.', array('!field' => t('Retailer ID'))));
       form_set_value($element, 0, $form_state);
     }
@@ -158,7 +159,7 @@ function publizon_block($op = 'list', $delta = 0) {
     case 'view':
       $content = '';
 
-      // Get site type
+      // Get site type.
       $type = variable_get('publizon_site_type', PUBLIZON_EBOOK);
 
       // Check for cached version of last loans.
@@ -168,7 +169,7 @@ function publizon_block($op = 'list', $delta = 0) {
       }
       else {
         try {
-          // Try to get connection with publizon and fetch list of last loans
+          // Try to get connection with publizon and fetch list of last loans.
           $client = PublizonClient::getClient();
           $products = $client->getLastLoansForAll($type);
 
@@ -196,14 +197,15 @@ function publizon_block($op = 'list', $delta = 0) {
 }
 
 /**
- * Default implementation fo hook_preprocess_publizon_actions(). It generates
- * the action links, button or icons on the different publizon product lists.
+ * Default implementation fo hook_preprocess_publizon_actions().
  *
+ * It generates the action links, button or icons on the different publizon
+ * product lists.
  */
 function template_preprocess_publizon_actions(&$vars) {
   $actions = array();
   switch ($vars['type']) {
-    // User loan list
+    // User loan list.
     case 'loan':
       // Should be handel by the sites as eReolen no longer supports download
       // (only streaming).
@@ -217,21 +219,27 @@ function template_preprocess_publizon_actions(&$vars) {
         '#weight' => 10,
       );
 
-    // Default button.
     case 'default':
+      // Default button.
       if (isset($vars['product']->teaser_link)) {
         $actions[] = array(
-          '#link' => l(t('Sample'), $vars['product']->teaser_link, array('html' => TRUE, 'attributes' => array('target' => '_blank', 'action' => 'sample'))),
+          '#link' => l(t('Sample'), $vars['product']->teaser_link, array(
+            'html' => TRUE,
+            'attributes' => array(
+              'target' => '_blank',
+              'action' => 'sample',
+            ),
+          )),
           '#class' => 'sample',
           '#weight' => -10,
         );
       }
       else {
-        // The book dosen't have a sample link, hence can't be downloaded.
+        // The book do not have a sample link, hence can't be downloaded.
         $actions[] = array(
-         '#link' => '<span>' . t('Unavailable') . '</span>',
-         '#class' => 'unavailable',
-         '#weight' => 1,
+          '#link' => '<span>' . t('Unavailable') . '</span>',
+          '#class' => 'unavailable',
+          '#weight' => 1,
         );
       }
       break;
@@ -246,12 +254,13 @@ function template_preprocess_publizon_actions(&$vars) {
  * Helper function that extracts the name of the author(s) on a ting object.
  *
  * @param object $ting_object
- *  Ting object.
+ *   Ting object.
  * @param bool $link
- *  If the parameter is true the authors returned is search links else plain
- *  text.
+ *   If the parameter is true the authors returned is search links else plain
+ *   text.
+ *
  * @return string
- *  The author(s) found and the empty string if non is found.
+ *   The author(s) found and the empty string if non is found.
  */
 function publizon_get_authors($ting_object, $link = TRUE) {
   $authors = '';
@@ -264,7 +273,7 @@ function publizon_get_authors($ting_object, $link = TRUE) {
     }
   }
   else {
-    // Find all authors involed.
+    // Find all authors involved.
     $contributors = array();
     if (isset($ting_object->record['dc:contributor']['dkdcplus:edt'])) {
       $contributors = array_merge($contributors, $ting_object->record['dc:contributor']['dkdcplus:edt']);
@@ -290,14 +299,16 @@ function publizon_get_authors($ting_object, $link = TRUE) {
 }
 
 /**
- * Search the T!NG data well for information based on the ISBN parsed to the
- * function. If more than one match is found only the first match is returned.
+ * Search the T!NG data well for information based on ISBN.
+ *
+ * If more than one match is found only the first match is returned.
  *
  * @param string $isbn
- *  ISBN number for the product that is searched.
+ *   ISBN number for the product that is searched.
+ *
  * @return TingObject
- *  Datawell object for the product found, if non is found FALSE will be
- *  returned.
+ *   Datawell object for the product found, if non is found FALSE will be
+ *   returned.
  */
 function publizon_ting_find_object($isbn) {
   // Ensure that the ting client is available.
@@ -310,7 +321,7 @@ function publizon_ting_find_object($isbn) {
 
   // Try to fetch ting object based on ISBN number. Sadly not all object in
   // ebooks or net sound have ISBN, but uses oss:PROVIDER-ID, which we can not
-  // search directly on (so no dc.identificer=*). Also therefor it have been
+  // search directly on (so no dc.identifier=*). Also therefor it have been
   // renamed, because it dose not only find object by ISBN.
   $request->setQuery($isbn);
   $request->setNumResults(1);
@@ -326,10 +337,10 @@ function publizon_ting_find_object($isbn) {
 }
 
 /**
- * Detect the current users platform and return a constances for that platform.
+ * Detect the current users platform and return a constance for that platform.
  *
  * @return int
- *  Returns the constances PUBLIZON_PLATFORM_IOS or PUBLIZON_PLATFORM_GENERIC.
+ *   Returns the constance PUBLIZON_PLATFORM_IOS or PUBLIZON_PLATFORM_GENERIC.
  */
 function publizon_get_client_platform() {
   $user_agent = $_SERVER['HTTP_USER_AGENT'];
